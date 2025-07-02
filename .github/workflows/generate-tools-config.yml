@@ -18,6 +18,9 @@ jobs:
     - name: Generate tools-config.js
       run: node generate-tools-config.js
 
+    - name: Install Git
+      run: apk add --no-cache git
+
     - name: Commit and push if changed
       run: |
         git config --global user.name 'github-actions[bot]'
