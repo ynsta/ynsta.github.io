@@ -10,20 +10,19 @@
 - **Responsive Design**: Works on desktop and mobile
 
 ### Implemented Features ✅
-- **Tool Gallery**: 
-  - Glassmorphism card design
-  - Hover effects and transitions
-  - Loading states
-  - Error handling for missing tools
-  - Icon fallback system
+- **Tool Gallery**:
+  - **Optimized Loading**: Gallery now renders instantly from a pre-built config file, with no client-side discovery.
+  - Glassmorphism card design, hover effects, and transitions.
+  - Robust error handling and icon fallback system.
 
 - **Badge Converter Tool**:
-  - Full functionality for NFC badge conversion
-  - Support for multiple badge types
-  - Copy-to-clipboard feature
-  - Input validation
-  - Example demonstrations
-  - Mobile-friendly interface
+  - Full functionality for NFC badge conversion.
+  - "Back to Tools" navigation link.
+  - Mobile-friendly interface.
+
+- **Development Workflow**:
+  - **Tool Template**: A starter template (`_template`) is now available for rapid development.
+  - **Automated Icon Detection**: The build script now automatically detects custom `icon.svg` files.
 
 ### Design System ✅
 - **Theme Established**:
@@ -36,20 +35,14 @@
 ## What's Left to Build
 
 ### Core Improvements
-1. **Navigation Enhancement**
-   - Add "Back to Tools" link in each tool
-   - Breadcrumb navigation
-   - Tool categories/tags
+1. **Search Functionality**
+   - Search tools by name.
+   - Filter by category.
+   - Quick access shortcuts.
 
-2. **Tool Template**
-   - Create starter template for new tools
-   - Include all theme styles
-   - Standard structure and meta tags
-
-3. **Search Functionality**
-   - Search tools by name
-   - Filter by category
-   - Quick access shortcuts
+2. **Further Navigation**
+   - Breadcrumb navigation.
+   - Tool categories/tags for better organization.
 
 ### Tool Development Approach
 Tools are added organically based on actual needs rather than following a predetermined roadmap. This ensures each tool serves a real purpose and gets proper attention during development.
@@ -74,9 +67,8 @@ Tools are added organically based on actual needs rather than following a predet
 - **CI/CD**: Configured and working
 
 ### Technical Debt
-- No shared CSS (each tool duplicates theme)
-- No tool template yet
-- Manual icon creation for each tool
+- **CSS Duplication**: Each tool still contains its own CSS to maintain 100% independence. This is a deliberate design choice, but it is a form of technical debt.
+- **No Search**: The gallery lacks a search function, which will become necessary as more tools are added.
 
 ## Known Issues
 
@@ -135,15 +127,9 @@ When returning to this project:
 
 ## Quick Start for New Tool
 
-```bash
-# 1. Create tool directory
-mkdir tool-name
-
-# 2. Copy badge-converter/index.html as template
-# 3. Modify for new tool functionality
-# 4. Add meta description and title
-# 5. Push to GitHub
-# 6. GitHub Actions will update config
-```
+1.  **Copy the template**: Duplicate the `_template` directory and rename it.
+2.  **Customize**: Modify the new `index.html` with your tool's content, title, and description.
+3.  **Add an icon** (optional): Add a custom `icon.svg` to the tool's directory.
+4.  **Push**: Commit and push to `main`. The gallery will update automatically.
 
 Remember: Each tool should solve a real problem and maintain the established quality standard.

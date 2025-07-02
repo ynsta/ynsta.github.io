@@ -83,35 +83,24 @@ node generate-tools-config.js
 
 ### Creating a New Tool
 
-1. **Directory Structure**
-```
-tool-name/
-├── index.html    # Required: Tool implementation
-├── icon.svg      # Optional: Custom icon
-└── [assets]/     # Optional: Additional files
-```
+1.  **Copy the Template**: Duplicate the `_template` directory and rename it to your new tool's name (e.g., `qr-code-generator`).
 
-2. **HTML Template**
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Tool description here">
-    <title>Tool Name</title>
-    <style>
-        /* Include theme styles */
-    </style>
-</head>
-<body>
-    <!-- Tool content -->
-    <script>
-        // Tool logic
-    </script>
-</body>
-</html>
-```
+2.  **Customize `index.html`**:
+    *   Open the `index.html` file inside your new tool's directory.
+    *   **Update Metadata**: Change the `<title>` and `<meta name="description">` to match your tool's functionality. This is crucial for discovery.
+    *   **Add HTML**: Build your tool's user interface inside the `<div class="container">`.
+    *   **Add CSS**: Add any tool-specific styles to the embedded `<style>` block. The core theme is already included.
+    *   **Add JavaScript**: Write your tool's logic inside the `<script>` block at the end of the file.
+
+3.  **Add a Custom Icon (Optional)**:
+    *   Create an `icon.svg` file and place it in your tool's directory. The build script will automatically detect it. If omitted, `default.svg` will be used.
+
+4.  **Test Locally**:
+    *   Run `node generate-tools-config.js` to update the tool list.
+    *   Open the main `index.html` in a local server to see your tool in the gallery and test its functionality.
+
+5.  **Push to GitHub**:
+    *   Commit your changes and push to the `main` branch. The GitHub Actions workflow will automatically regenerate the `tools-config.js` and deploy your new tool.
 
 3. **Theme CSS Variables**
 ```css

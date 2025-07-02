@@ -1,35 +1,27 @@
 # Active Context: ynsta.github.io Tools Collection
 
 ## Current Work Focus
-- Memory bank initialization completed
-- Project structure documented
-- One tool currently implemented (badge-converter)
-- Ready for expansion with new tools
+- **Project Refactoring Complete**: The initial code review and refactoring tasks are now finished.
+- **Development Workflow Established**: A robust, template-based workflow is in place for adding new tools.
+- **Ready for New Tool Development**: The project is in a stable and well-documented state, ready for the creation of new tools.
 
 ## Recent Changes
-- Created memory-bank directory structure
-- Documented project architecture and patterns
-- Established design system guidelines
-- Captured technical constraints and deployment process
+- **Optimized Gallery Page**: Refactored `index.html` to be a pure renderer, significantly improving its performance and reliability.
+- **Enhanced Build Script**: Updated `generate-tools-config.js` to be the single source of truth for tool discovery, including metadata and custom icon detection.
+- **Created Tool Template**: Added a `_template` directory to serve as a starter kit for all new tools.
+- **Improved Navigation**: Added a "Back to Tools" link in the `badge-converter` tool and the new template.
+- **Updated Memory Bank**: All memory bank files have been updated to reflect these architectural improvements.
 
 ## Next Steps
 
 ### Immediate Tasks
-1. **Test Current Setup**
-   - Verify badge converter works correctly
-   - Ensure GitHub Actions updates tools-config.js
-   - Check responsive design on mobile
+1.  **Develop a New Tool**: The primary focus is now on expanding the toolset. Use the new `_template` to create a new utility based on an emerging need.
+2.  **Monitor and Verify**: Ensure the automated CI/CD pipeline correctly adds the next new tool to the gallery.
 
-2. **Tool Development**
-   - Add tools as specific needs arise
-   - No predetermined list or roadmap
-   - Focus on quality over quantity
-
-3. **Improvements**
-   - Create a tool template for faster development
-   - Add navigation back to home from tools
-   - Consider adding search functionality
-   - Implement keyboard shortcuts
+### Future Considerations
+- **Implement Search**: As the number of tools grows, a search/filter functionality on the main gallery will become the next high-priority improvement.
+- **Tool Categories**: Consider adding a tagging or category system to organize tools.
+- **PWA Capabilities**: Explore making the site a Progressive Web App for offline access.
 
 ### Future Considerations
 - Tool categories when collection grows
@@ -67,11 +59,11 @@
 - Mobile-first responsive design
 
 ### Development Workflow
-1. Create tool in new directory
-2. Follow established HTML structure
-3. Include proper meta tags
-4. Test locally before pushing
-5. Let GitHub Actions handle config update
+1.  **Copy `_template`**: Duplicate the template directory and rename it.
+2.  **Customize**: Modify the new `index.html` with the tool's logic, title, and description.
+3.  **Add Icon** (Optional): Add a custom `icon.svg`.
+4.  **Test Locally**: Run `node generate-tools-config.js` and use a local server.
+5.  **Push to `main`**: The CI/CD pipeline handles the rest automatically.
 
 ## Learnings and Project Insights
 
