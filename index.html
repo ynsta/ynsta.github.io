@@ -122,35 +122,8 @@
         <div class="tools-grid" id="toolsGrid"></div>
     </div>
 
+    <script src="tools-config.js"></script>
     <script>
-        // Tools configuration - customize according to your structure
-        const toolsConfig = [
-            {
-                folder: 'badge-converter',
-                file: 'index.html',
-                title: 'Auto', // Will be retrieved from <title>
-                description: 'Auto', // Will be retrieved from meta description or title
-                icon: '🏷️' // Fallback emoji if no SVG icon
-            },
-            {
-                folder: 'network-tools',
-                file: 'index.html',
-                title: 'Auto',
-                description: 'Auto',
-                icon: '🌐'
-            },
-            {
-                folder: 'crypto-tools',
-                file: 'index.html',
-                title: 'Auto',
-                description: 'Auto',
-                icon: '🔐'
-            }
-            // Add your tools here...
-            // Use 'Auto' for title/description for automatic retrieval
-            // Icon will be automatically detected: folder/icon.svg then default.svg then emoji
-        ];
-
         async function loadTools() {
             const loading = document.getElementById('loading');
             const toolsGrid = document.getElementById('toolsGrid');
