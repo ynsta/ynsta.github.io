@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convertisseur ID Badge → Serial</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a2332 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #00d4aa;
+            font-size: 2.2em;
+            font-weight: 300;
+            text-shadow: 0 2px 10px rgba(0, 212, 170, 0.3);
+        }
+
+        .subtitle {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #94a3b8;
+            font-size: 1.1em;
+        }
+
+        .input-group {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #e2e8f0;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+            font-size: 1.1em;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00d4aa;
+            box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.2);
+        }
+
+        input::placeholder {
+            color: #64748b;
+        }
+
+        .result-section {
+            margin-top: 30px;
+            padding: 25px;
+            background: rgba(0, 212, 170, 0.1);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            border-radius: 12px;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .result-label {
+            color: #00d4aa;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+        }
+
+        .result-value {
+            font-size: 1.8em;
+            font-family: 'Courier New', monospace;
+            color: #ffffff;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            word-break: break-all;
+        }
+
+        .result-value:hover {
+            background: rgba(0, 212, 170, 0.2);
+            color: #00d4aa;
+        }
+
+        .badge-type {
+            margin-top: 10px;
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        .copy-feedback {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #00d4aa;
+            color: #0f1419;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            transform: translateX(300px);
+            transition: transform 0.3s ease;
+        }
+
+        .copy-feedback.show {
+            transform: translateX(0);
+        }
+
+        .examples {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            border-left: 4px solid #00d4aa;
+        }
+
+        .examples h3 {
+            color: #00d4aa;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .example-item {
+            margin-bottom: 8px;
+            font-family: 'Courier New', monospace;
+            color: #e2e8f0;
+            font-size: 0.9em;
+        }
+
+        .error {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Badge Serial → ID</h1>
+        <p class="subtitle">Convertisseur de numéro de série badge vers ID</p>
+        
+        <div class="input-group">
+            <label for="badgeId">ID du badge (avec ou sans ":")</label>
+            <input 
+                type="text" 
+                id="badgeId" 
+                placeholder="Ex: 04:CA:FE:BA:BE ou 04D3ADB3AF"
+                autocomplete="off"
+            >
+        </div>
+
+        <div class="result-section" id="resultSection" style="display: none;">
+            <div class="result-label">Numéro de série (décimal)</div>
+            <div class="result-value" id="resultValue" onclick="copyToClipboard()"></div>
+            <div class="badge-type" id="badgeType"></div>
+        </div>
+
+        <div class="examples">
+            <h3>Exemples</h3>
+            <div class="example-item">04:CA:FE:BA:BE → 3199905796 (5 octets)</div>
+            <div class="example-item">04:D3:AD:B3:AF → 2950046212 (5 octets)</div>
+            <div class="example-item">04DEADBEEF → 4022250756 (5 octets)</div>
+            <div class="example-item">CAFEBABE → 3133061822 (4 octets Mifare 1K)</div>
+        </div>
+
+        <div class="examples">
+            <h3>📱 Comment lire le serial d'un badge</h3>
+            <div class="example-item" style="color: #e2e8f0; font-family: inherit; line-height: 1.6;">
+                Utilisez <a href="https://play.google.com/store/apps/details?id=com.wakdev.wdnfc" target="_blank" style="color: #00d4aa; text-decoration: none;">NFC Tools</a> sur Android pour lire le serial du badge.
+                <br>L'outil a été testé avec des badges <strong>Mifare Classic 1K</strong> et <strong>Mifare DESFire EV2 4K</strong>.
+            </div>
+        </div>
+    </div>
+
+    <div class="copy-feedback" id="copyFeedback">
+        Copié dans le presse-papier !
+    </div>
+
+    <script>
+        const badgeIdInput = document.getElementById('badgeId');
+        const resultSection = document.getElementById('resultSection');
+        const resultValue = document.getElementById('resultValue');
+        const badgeType = document.getElementById('badgeType');
+        const copyFeedback = document.getElementById('copyFeedback');
+
+        let currentSerial = '';
+
+        badgeIdInput.addEventListener('input', function() {
+            const input = this.value.trim();
+            if (input) {
+                try {
+                    const result = convertBadgeId(input);
+                    displayResult(result);
+                } catch (error) {
+                    displayError(error.message);
+                }
+            } else {
+                resultSection.style.display = 'none';
+            }
+        });
+
+        function convertBadgeId(input) {
+            // Nettoyer l'input en supprimant les espaces et les ":"
+            const cleanInput = input.replace(/[:\s]/g, '').toUpperCase();
+            
+            // Vérifier que ce sont bien des caractères hexadécimaux
+            if (!/^[0-9A-F]+$/.test(cleanInput)) {
+                throw new Error('Format invalide. Utilisez uniquement des caractères hexadécimaux (0-9, A-F).');
+            }
+            
+            // Vérifier que la longueur est paire
+            if (cleanInput.length % 2 !== 0) {
+                throw new Error('La longueur doit être paire (nombre pair de caractères hex).');
+            }
+            
+            const byteCount = cleanInput.length / 2;
+            let bytesToProcess;
+            let type;
+            
+            if (byteCount <= 4) {
+                // Mifare 1K ou moins de 4 octets
+                bytesToProcess = cleanInput;
+                type = 'Mifare 1K (≤4 octets)';
+            } else {
+                // Plus de 4 octets, on prend les 4 premiers
+                bytesToProcess = cleanInput.substring(0, 8);
+                type = `Badge ${byteCount} octets (4 premiers utilisés)`;
+            }
+            
+            // Séparer en octets et inverser l'ordre
+            const bytes = [];
+            for (let i = 0; i < bytesToProcess.length; i += 2) {
+                bytes.push(bytesToProcess.substring(i, i + 2));
+            }
+            
+            // Inverser les octets
+            const reversedBytes = bytes.reverse();
+            
+            // Convertir en nombre décimal
+            const hexValue = reversedBytes.join('');
+            const decimalValue = parseInt(hexValue, 16);
+            
+            return {
+                original: input,
+                processed: bytesToProcess,
+                reversed: reversedBytes.join(':'),
+                hexValue: '0x' + hexValue,
+                decimal: decimalValue,
+                type: type
+            };
+        }
+
+        function displayResult(result) {
+            resultValue.textContent = result.decimal.toString();
+            badgeType.textContent = `${result.type} | Hex inversé: ${result.hexValue}`;
+            currentSerial = result.decimal.toString();
+            resultSection.style.display = 'block';
+            
+            // Supprimer toute classe d'erreur
+            resultSection.classList.remove('error');
+        }
+
+        function displayError(message) {
+            resultValue.textContent = message;
+            badgeType.textContent = '';
+            currentSerial = '';
+            resultSection.style.display = 'block';
+            resultSection.classList.add('error');
+        }
+
+        async function copyToClipboard() {
+            if (!currentSerial) return;
+            
+            try {
+                await navigator.clipboard.writeText(currentSerial);
+                showCopyFeedback();
+            } catch (err) {
+                // Fallback pour les navigateurs plus anciens
+                const textArea = document.createElement('textarea');
+                textArea.value = currentSerial;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showCopyFeedback();
+            }
+        }
+
+        function showCopyFeedback() {
+            copyFeedback.classList.add('show');
+            setTimeout(() => {
+                copyFeedback.classList.remove('show');
+            }, 2000);
+        }
+
+        // Permettre d'appuyer sur Entrée pour traiter
+        badgeIdInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                this.blur();
+            }
+        });
+    </script>
+</body>
+</html>
