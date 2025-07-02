@@ -32,6 +32,21 @@
             max-width: 600px;
             width: 100%;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .back-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 1.2em;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: #00d4aa;
         }
 
         h1 {
@@ -176,6 +191,7 @@
 </head>
 <body>
     <div class="container">
+        <a href="../" class="back-link" title="Back to Tools">←</a>
         <h1>Badge Serial → ID</h1>
         <p class="subtitle">Badge serial number to ID converter</p>
         
