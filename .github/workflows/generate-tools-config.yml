@@ -8,23 +8,24 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: node:18-alpine
+    
+    permissions:
+      contents: write
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
 
     - name: Generate tools-config.js
       run: node generate-tools-config.js
 
-    - name: Install Git
-      run: apk add --no-cache git
-
     - name: Commit and push if changed
-      run: |
-        git config --global user.name 'github-actions[bot]'
-        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-        git add tools-config.js
-        git diff --staged --quiet || git commit -m "Automated: Updated tools-config.js"
-        git push
+      uses: stefanzweifel/git-auto-commit-action@v6
+      with:
+        commit_message: "Automated: Updated tools-config.js"
+        file_pattern: tools-config.js
