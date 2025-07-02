@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Tools</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a2332 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 50px;
+            color: #00d4aa;
+            font-size: 3em;
+            font-weight: 300;
+            text-shadow: 0 2px 10px rgba(0, 212, 170, 0.3);
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .tool-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            border-color: rgba(0, 212, 170, 0.5);
+        }
+
+        .tool-icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #00d4aa, #0ea5e9);
+            font-size: 2.5em;
+        }
+
+        .tool-icon img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+        }
+
+        .tool-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        .tool-description {
+            color: #94a3b8;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        .loading {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 1.2em;
+            margin-top: 100px;
+        }
+
+        .error {
+            text-align: center;
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛠️ My Tools</h1>
+        
+        <div class="loading" id="loading">
+            Loading tools...
+        </div>
+        
+        <div class="tools-grid" id="toolsGrid"></div>
+    </div>
+
+    <script>
+        // Tools configuration - customize according to your structure
+        const toolsConfig = [
+            {
+                folder: 'badge-converter',
+                file: 'index.html',
+                title: 'Auto', // Will be retrieved from <title>
+                description: 'Auto', // Will be retrieved from meta description or title
+                icon: '🏷️' // Fallback emoji if no SVG icon
+            },
+            {
+                folder: 'network-tools',
+                file: 'index.html',
+                title: 'Auto',
+                description: 'Auto',
+                icon: '🌐'
+            },
+            {
+                folder: 'crypto-tools',
+                file: 'index.html',
+                title: 'Auto',
+                description: 'Auto',
+                icon: '🔐'
+            }
+            // Add your tools here...
+            // Use 'Auto' for title/description for automatic retrieval
+            // Icon will be automatically detected: folder/icon.svg then default.svg then emoji
+        ];
+
+        async function loadTools() {
+            const loading = document.getElementById('loading');
+            const toolsGrid = document.getElementById('toolsGrid');
+            
+            try {
+                const validTools = [];
+                
+                for (const tool of toolsConfig) {
+                    try {
+                        // Check if file exists
+                        const response = await fetch(`${tool.folder}/${tool.file}`, { method: 'HEAD' });
+                        if (response.ok) {
+                            // Check if specific icon exists in folder
+                            try {
+                                const iconResponse = await fetch(`${tool.folder}/icon.svg`, { method: 'HEAD' });
+                                if (iconResponse.ok) {
+                                    tool.iconFile = 'icon.svg';
+                                } else {
+                                    tool.iconFile = null; // Will use default.svg
+                                }
+                            } catch (e) {
+                                tool.iconFile = null; // Will use default.svg
+                            }
+                            
+                            // Retrieve metadata from HTML
+                            try {
+                                const htmlResponse = await fetch(`${tool.folder}/${tool.file}`);
+                                const htmlText = await htmlResponse.text();
+                                
+                                // Extract title if not specified
+                                if (!tool.title || tool.title === 'Auto') {
+                                    const titleMatch = htmlText.match(/<title>(.*?)<\/title>/i);
+                                    tool.title = titleMatch ? titleMatch[1] : tool.folder.replace('-', ' ').replace('_', ' ');
+                                }
+                                
+                                // Extract description if not specified
+                                if (!tool.description || tool.description === 'Auto') {
+                                    const descMatch = htmlText.match(/<meta name="description" content="(.*?)"/i);
+                                    if (descMatch) {
+                                        tool.description = descMatch[1];
+                                    } else {
+                                        // Fallback to title if no meta description
+                                        const titleMatch = htmlText.match(/<title>(.*?)<\/title>/i);
+                                        tool.description = titleMatch ? titleMatch[1] : 'Undocumented tool';
+                                    }
+                                }
+                                
+                            } catch (e) {
+                                // In case of error, use default values
+                                if (!tool.title) tool.title = tool.folder.replace('-', ' ').replace('_', ' ');
+                                if (!tool.description) tool.description = 'Undocumented tool';
+                            }
+                            validTools.push(tool);
+                        }
+                    } catch (e) {
+                        console.log(`Tool ${tool.folder} not found`);
+                    }
+                }
+                
+                if (validTools.length === 0) {
+                    throw new Error('No tools found');
+                }
+                
+                loading.style.display = 'none';
+                renderTools(validTools);
+                
+            } catch (error) {
+                loading.innerHTML = `<div class="error">Loading error: ${error.message}</div>`;
+            }
+        }
+
+        function renderTools(tools) {
+            const toolsGrid = document.getElementById('toolsGrid');
+            
+            toolsGrid.innerHTML = tools.map(tool => {
+                let iconHtml;
+                if (tool.iconFile) {
+                    // Icône spécifique au dossier trouvée
+                    iconHtml = `<img src="${tool.folder}/${tool.iconFile}" alt="${tool.title}" onerror="this.src='default.svg'; this.onerror=function(){this.parentElement.innerHTML='${tool.icon || '🔧'}';}">`;
+                } else {
+                    // Fallback sur default.svg puis sur emoji
+                    iconHtml = `<img src="default.svg" alt="${tool.title}" onerror="this.parentElement.innerHTML='${tool.icon || '🔧'}';">`;
+                }
+                
+                return `
+                    <a href="${tool.folder}/${tool.file}" class="tool-card">
+                        <div class="tool-icon">
+                            ${iconHtml}
+                        </div>
+                        <div class="tool-title">${tool.title}</div>
+                        <div class="tool-description">${tool.description}</div>
+                    </a>
+                `;
+            }).join('');
+        }
+
+        // Auto-discovery alternative (experimental)
+        async function autoDiscoverTools() {
+            // This function tries to automatically discover tools
+            // Limitation: requires knowing folder names in advance
+            const commonFolders = [
+                'badge-converter', 'network-tools', 'crypto-tools', 
+                'password-gen', 'qr-generator', 'base64-tools',
+                'json-formatter', 'regex-tester', 'color-picker'
+            ];
+            
+            const discoveredTools = [];
+            
+            for (const folder of commonFolders) {
+                try {
+                    const response = await fetch(`${folder}/index.html`, { method: 'HEAD' });
+                    if (response.ok) {
+                        // Check if specific icon exists
+                        let iconFile = null;
+                        try {
+                            const iconResponse = await fetch(`${folder}/icon.svg`, { method: 'HEAD' });
+                            if (iconResponse.ok) {
+                                iconFile = 'icon.svg';
+                            }
+                        } catch (e) {
+                            // No specific icon, will use default.svg
+                        }
+                        
+                        // Read content to extract title and description
+                        const htmlResponse = await fetch(`${folder}/index.html`);
+                        const htmlText = await htmlResponse.text();
+                        
+                        const titleMatch = htmlText.match(/<title>(.*?)<\/title>/i);
+                        const descMatch = htmlText.match(/<meta name="description" content="(.*?)"/i);
+                        
+                        let title = titleMatch ? titleMatch[1] : folder.replace('-', ' ').replace('_', ' ');
+                        let description;
+                        
+                        if (descMatch) {
+                            description = descMatch[1];
+                        } else if (titleMatch) {
+                            description = titleMatch[1]; // Fallback to title
+                        } else {
+                            description = 'Undocumented tool';
+                        }
+                        
+                        discoveredTools.push({
+                            folder: folder,
+                            file: 'index.html',
+                            title: title,
+                            description: description,
+                            icon: '🔧',
+                            iconFile: iconFile
+                        });
+                    }
+                } catch (e) {
+                    // Folder not found, continue
+                }
+            }
+            
+            return discoveredTools;
+        }
+
+        // Start loading
+        loadTools();
+    </script>
+</body>
+</html>

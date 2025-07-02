@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Convertisseur ID Badge → Serial</title>
+    <meta name="description" content="Converts NFC badge serials to decimal ID for Mifare Classic 1K and DESFire EV2">
+    <title>Badge Serial → ID Converter</title>
     <style>
         * {
             margin: 0;
@@ -176,10 +177,10 @@
 <body>
     <div class="container">
         <h1>Badge Serial → ID</h1>
-        <p class="subtitle">Convertisseur de numéro de série badge vers ID</p>
+        <p class="subtitle">Badge serial number to ID converter</p>
         
         <div class="input-group">
-            <label for="badgeId">ID du badge (avec ou sans ":")</label>
+            <label for="badgeId">Badge ID (with or without ":")</label>
             <input 
                 type="text" 
                 id="badgeId" 
@@ -189,30 +190,30 @@
         </div>
 
         <div class="result-section" id="resultSection" style="display: none;">
-            <div class="result-label">Numéro de série (décimal)</div>
+            <div class="result-label">Serial number (decimal)</div>
             <div class="result-value" id="resultValue" onclick="copyToClipboard()"></div>
             <div class="badge-type" id="badgeType"></div>
         </div>
 
         <div class="examples">
-            <h3>Exemples</h3>
-            <div class="example-item">04:CA:FE:BA:BE → 3199905796 (5 octets)</div>
-            <div class="example-item">04:D3:AD:B3:AF → 2950046212 (5 octets)</div>
-            <div class="example-item">04DEADBEEF → 4022250756 (5 octets)</div>
-            <div class="example-item">CAFEBABE → 3133061822 (4 octets Mifare 1K)</div>
+            <h3>Examples</h3>
+            <div class="example-item">04:CA:FE:BA:BE → 3199905796 (5 bytes)</div>
+            <div class="example-item">04:D3:AD:B3:AF → 2950046212 (5 bytes)</div>
+            <div class="example-item">04DEADBEEF → 4022250756 (5 bytes)</div>
+            <div class="example-item">CAFEBABE → 3133061822 (4 bytes Mifare 1K)</div>
         </div>
 
         <div class="examples">
-            <h3>📱 Comment lire le serial d'un badge</h3>
+            <h3>📱 How to read badge serial</h3>
             <div class="example-item" style="color: #e2e8f0; font-family: inherit; line-height: 1.6;">
-                Utilisez <a href="https://play.google.com/store/apps/details?id=com.wakdev.wdnfc" target="_blank" style="color: #00d4aa; text-decoration: none;">NFC Tools</a> sur Android pour lire le serial du badge.
-                <br>L'outil a été testé avec des badges <strong>Mifare Classic 1K</strong> et <strong>Mifare DESFire EV2 4K</strong>.
+                Use <a href="https://play.google.com/store/apps/details?id=com.wakdev.wdnfc" target="_blank" style="color: #00d4aa; text-decoration: none;">NFC Tools</a> on Android to read the badge serial.
+                <br>The tool has been tested with <strong>Mifare Classic 1K</strong> and <strong>Mifare DESFire EV2 4K</strong> badges.
             </div>
         </div>
     </div>
 
     <div class="copy-feedback" id="copyFeedback">
-        Copié dans le presse-papier !
+        Copied to clipboard!
     </div>
 
     <script>
@@ -239,17 +240,17 @@
         });
 
         function convertBadgeId(input) {
-            // Nettoyer l'input en supprimant les espaces et les ":"
+            // Clean input by removing spaces and ":"
             const cleanInput = input.replace(/[:\s]/g, '').toUpperCase();
             
-            // Vérifier que ce sont bien des caractères hexadécimaux
+            // Check that it's hexadecimal characters
             if (!/^[0-9A-F]+$/.test(cleanInput)) {
-                throw new Error('Format invalide. Utilisez uniquement des caractères hexadécimaux (0-9, A-F).');
+                throw new Error('Invalid format. Use only hexadecimal characters (0-9, A-F).');
             }
             
-            // Vérifier que la longueur est paire
+            // Check that length is even
             if (cleanInput.length % 2 !== 0) {
-                throw new Error('La longueur doit être paire (nombre pair de caractères hex).');
+                throw new Error('Length must be even (even number of hex characters).');
             }
             
             const byteCount = cleanInput.length / 2;
@@ -257,25 +258,25 @@
             let type;
             
             if (byteCount <= 4) {
-                // Mifare 1K ou moins de 4 octets
+                // Mifare 1K or less than 4 bytes
                 bytesToProcess = cleanInput;
-                type = 'Mifare 1K (≤4 octets)';
+                type = 'Mifare 1K (≤4 bytes)';
             } else {
-                // Plus de 4 octets, on prend les 4 premiers
+                // More than 4 bytes, take first 4
                 bytesToProcess = cleanInput.substring(0, 8);
-                type = `Badge ${byteCount} octets (4 premiers utilisés)`;
+                type = `Badge ${byteCount} bytes (first 4 used)`;
             }
             
-            // Séparer en octets et inverser l'ordre
+            // Split into bytes and reverse order
             const bytes = [];
             for (let i = 0; i < bytesToProcess.length; i += 2) {
                 bytes.push(bytesToProcess.substring(i, i + 2));
             }
             
-            // Inverser les octets
+            // Reverse bytes
             const reversedBytes = bytes.reverse();
             
-            // Convertir en nombre décimal
+            // Convert to decimal number
             const hexValue = reversedBytes.join('');
             const decimalValue = parseInt(hexValue, 16);
             
@@ -291,11 +292,11 @@
 
         function displayResult(result) {
             resultValue.textContent = result.decimal.toString();
-            badgeType.textContent = `${result.type} | Hex inversé: ${result.hexValue}`;
+            badgeType.textContent = `${result.type} | Reversed hex: ${result.hexValue}`;
             currentSerial = result.decimal.toString();
             resultSection.style.display = 'block';
             
-            // Supprimer toute classe d'erreur
+            // Remove any error class
             resultSection.classList.remove('error');
         }
 
@@ -314,7 +315,7 @@
                 await navigator.clipboard.writeText(currentSerial);
                 showCopyFeedback();
             } catch (err) {
-                // Fallback pour les navigateurs plus anciens
+                // Fallback for older browsers
                 const textArea = document.createElement('textarea');
                 textArea.value = currentSerial;
                 document.body.appendChild(textArea);
@@ -332,7 +333,7 @@
             }, 2000);
         }
 
-        // Permettre d'appuyer sur Entrée pour traiter
+        // Allow pressing Enter to process
         badgeIdInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 this.blur();
